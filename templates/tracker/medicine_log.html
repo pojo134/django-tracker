@@ -131,7 +131,7 @@
             <div class="medicine-item {% if log.taken %}taken{% else %}not-taken{% endif %}">
                 <h3>{{ log.medicine.name }}</h3>
                 <p><strong>Dosage:</strong> {{ log.medicine.dosage }}</p>
-                <p><strong>Status:</strong> 
+                <p class="mb-0"><strong>Status:</strong> 
                     {% if log.taken %}
                     <span class="success">✓ Taken</span>
                     {% else %}
@@ -139,11 +139,21 @@
                     {% endif %}
                 </p>
                 
-                <div class="medicine-actions">
+                <div class="text-center mt-2">
+                    <form method="post" action="{% url 'deactivate_medicine' log.medicine.id %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger btn-sm" style="font-size: 0.75rem; padding: 0.25rem 0.75rem;" title="Remove Medicine">
+                            <i class="material-icons" style="font-size: 12px; vertical-align: middle; margin-right: 2px;">close</i>
+                            <span style="vertical-align: middle;">Remove</span>
+                        </button>
+                    </form>
+                </div>
+                
+                <div class="medicine-actions" style="margin-top: 10px; display: flex; justify-content: center;">
                     {% if not log.taken %}
                     <form method="post" action="{% url 'mark_taken' log.id %}">
                         {% csrf_token %}
-                        <button type="submit" class="btn btn-sm">Mark as Taken</button>
+                        <button type="submit" class="btn btn-accent" style="width: 180px; padding: 10px;">Mark as Taken</button>
                     </form>
                     {% endif %}
                 </div>
