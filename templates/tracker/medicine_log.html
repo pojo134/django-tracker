@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Medicine Log</title>
+</head>
+<body>
+    <h2>Medicine Log for {{ log.date }}</h2>
+    <p>Status: {{ "Taken" if log.taken else "Not Taken" }}</p>
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit" {% if log.taken %}disabled{% endif %}>Mark as Taken</button>
+    </form>
+    <a href="{% url 'logout' %}">Logout</a>
+</body>
+</html>

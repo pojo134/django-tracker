@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Medicine Log</title>
+</head>
+<body>
+    <h2>Medicine Log for {{ log.date }}</h2>
+    <p>Medicine taken: {{ log.taken }}</p>
+    {% if not log.taken %}
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit">Mark as Taken</button>
+    </form>
+    {% endif %}
+    <a href="{% url 'logout' %}">Logout</a>
+</body>
+</html>
