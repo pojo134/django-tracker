@@ -1,49 +1,30 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Add Medicine</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-        .form-container {
-            background-color: #f5f5f5;
-            padding: 20px;
-            border-radius: 5px;
-        }
-        button {
-            padding: 8px 16px;
-            background-color: #1976d2;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-        a {
-            color: #1976d2;
-            text-decoration: none;
-            margin-left: 10px;
-        }
-        a:hover {
-            text-decoration: underline;
-        }
-    </style>
-</head>
-<body>
-    <h1>Add New Medicine</h1>
+{% extends 'base.html' %}
+
+{% block title %}Add Medicine | Medicine Tracker{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2 class="text-center mb-3">Add New Medicine</h2>
     
-    <div class="form-container">
-        <form method="post">
-            {% csrf_token %}
-            {{ form.as_p }}
-            <button type="submit">Add Medicine</button>
-            <a href="{% url 'medicine_log' %}">Cancel</a>
-        </form>
-    </div>
-</body>
-</html>
+    <form method="post">
+        {% csrf_token %}
+        
+        {% for field in form %}
+        <div class="form-group">
+            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+            {{ field }}
+            {% if field.errors %}
+            <div class="error">
+                {{ field.errors }}
+            </div>
+            {% endif %}
+        </div>
+        {% endfor %}
+        
+        <div class="medicine-actions">
+            <button type="submit" class="btn btn-accent">Add Medicine</button>
+            <a href="{% url 'medicine_log' %}" class="btn btn-secondary">Cancel</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

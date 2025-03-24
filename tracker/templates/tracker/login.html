@@ -1,14 +1,27 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Login</title>
-</head>
-<body>
-    <h2>Login</h2>
+{% extends 'base.html' %}
+
+{% block title %}Login | Medicine Tracker{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2 class="text-center mb-3">Login to Your Account</h2>
     <form method="post">
         {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">Login</button>
+        {% for field in form %}
+        <div class="form-group">
+            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+            {{ field }}
+            {% if field.errors %}
+            <div class="error">
+                {{ field.errors }}
+            </div>
+            {% endif %}
+        </div>
+        {% endfor %}
+        <div class="text-center">
+            <button type="submit" class="btn">Login</button>
+        </div>
     </form>
-</body>
-</html>
+    <p class="text-center mt-3">Don't have an account? <a href="{% url 'register' %}">Register here</a>.</p>
+</div>
+{% endblock %}

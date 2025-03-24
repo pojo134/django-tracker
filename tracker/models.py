@@ -19,3 +19,23 @@ class MedicineLog(models.Model):
 
     class Meta:
         unique_together = ('user', 'medicine', 'date')
+        
+    @classmethod
+    def get_weekly_logs(cls, user, start_date):
+        """Get logs for a week starting from start_date"""
+        from datetime import timedelta
+        end_date = start_date + timedelta(days=6)
+        return cls.objects.filter(
+            user=user,
+            date__gte=start_date,
+            date__lte=end_date
+        ).order_by('date', 'medicine__name')
+    
+    @classmethod
+    def get_monthly_logs(cls, user, year, month):
+        """Get logs for a specific month"""
+        return cls.objects.filter(
+            user=user,
+            date__year=year,
+            date__month=month
+        ).order_by('date', 'medicine__name')

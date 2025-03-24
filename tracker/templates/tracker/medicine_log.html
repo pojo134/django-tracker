@@ -1,17 +1,250 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Medicine Log</title>
-</head>
-<body>
-    <h2>Medicine Log for {{ log.date }}</h2>
-    <p>Medicine taken: {{ log.taken }}</p>
-    {% if not log.taken %}
-    <form method="post">
-        {% csrf_token %}
-        <button type="submit">Mark as Taken</button>
-    </form>
+{% extends 'base.html' %}
+
+{% block title %}Medicine Log | Medicine Tracker{% endblock %}
+
+{% block extra_styles %}
+<style>
+    /* Center all elements */
+    .card {
+        text-align: center;
+    }
+    
+    h2, h3, h4 {
+        text-align: center;
+    }
+    
+    /* Calendar grid styles */
+    .calendar-grid {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        gap: 10px;
+        margin: 0 auto;
+        max-width: 100%;
+    }
+    
+    .calendar-day {
+        border: 1px solid #ddd;
+        border-radius: var(--border-radius);
+        padding: 10px;
+        min-height: 100px;
+        background-color: white;
+    }
+    
+    .calendar-day-header {
+        font-weight: bold;
+        margin-bottom: 5px;
+        background-color: var(--primary-color);
+        color: white;
+        padding: 5px;
+        border-radius: 4px;
+    }
+    
+    .medicine-status {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 5px 0;
+    }
+    
+    .check-icon {
+        color: var(--success-color);
+        font-size: 1.2rem;
+        margin-right: 5px;
+    }
+    
+    .medicine-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+        margin: 0 auto;
+        max-width: 1000px;
+    }
+    
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+        .calendar-grid {
+            grid-template-columns: repeat(1, 1fr);
+        }
+        
+        .nav-buttons {
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .nav-buttons a {
+            margin: 5px 0;
+            width: 80%;
+        }
+    }
+    
+    /* Navigation buttons */
+    .nav-buttons {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 30px;
+        flex-wrap: wrap;
+    }
+    
+    .nav-buttons a {
+        display: inline-block;
+        margin: 0 10px;
+        padding: 15px 30px;
+        color: white;
+        text-decoration: none;
+        border-radius: 8px;
+        font-weight: bold;
+        font-size: 1.2rem;
+        transition: transform 0.2s;
+    }
+    
+    .nav-buttons a:hover {
+        transform: translateY(-3px);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Debug info -->
+<div style="background-color: #f0f0f0; padding: 10px; margin-bottom: 10px; border: 1px solid #ccc; text-align: center;">
+    <p><strong>Debug:</strong> View Type: {{ view_type }}</p>
+</div>
+
+<div class="card">
+<div class="nav-buttons">
+    <a href="{% url 'medicine_log' %}" style="background-color: {% if view_type == 'daily' %}#ff7e5f{% else %}#47b8e0{% endif %};">Daily</a>
+    <a href="{% url 'weekly_log' %}" style="background-color: {% if view_type == 'weekly' %}#ff7e5f{% else %}#47b8e0{% endif %};">Weekly</a>
+    <a href="{% url 'monthly_log' %}" style="background-color: {% if view_type == 'monthly' %}#ff7e5f{% else %}#47b8e0{% endif %};">Monthly</a>
+</div>
+
+    {% if view_type == 'daily' %}
+    <h2 class="mb-3">Medicine Log for {{ today }}</h2>
+    {% elif view_type == 'weekly' %}
+    <h2 class="mb-3">Weekly Medicine Log ({{ start_date|date:"M d" }} - {{ end_date|date:"M d, Y" }})</h2>
+    {% elif view_type == 'monthly' %}
+    <h2 class="mb-3">Monthly Medicine Log ({{ month_name }} {{ year }})</h2>
     {% endif %}
-    <a href="{% url 'logout' %}">Logout</a>
-</body>
-</html>
+    
+    {% if view_type == 'daily' %}
+        {% if logs %}
+        <div class="medicine-grid">
+            {% for log in logs %}
+            <div class="medicine-item {% if log.taken %}taken{% else %}not-taken{% endif %}">
+                <h3>{{ log.medicine.name }}</h3>
+                <p><strong>Dosage:</strong> {{ log.medicine.dosage }}</p>
+                <p><strong>Status:</strong> 
+                    {% if log.taken %}
+                    <span class="success">✓ Taken</span>
+                    {% else %}
+                    <span class="error">Not Taken</span>
+                    {% endif %}
+                </p>
+                
+                <div class="medicine-actions">
+                    {% if not log.taken %}
+                    <form method="post" action="{% url 'mark_taken' log.id %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-sm">Mark as Taken</button>
+                    </form>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="message warning">
+            <p>You don't have any active medicines. Add one below!</p>
+        </div>
+        {% endif %}
+    {% elif view_type == 'weekly' %}
+        {% if grouped_logs %}
+        <div class="calendar-grid">
+            <!-- Day headers -->
+            <div class="calendar-day-header">Sunday</div>
+            <div class="calendar-day-header">Monday</div>
+            <div class="calendar-day-header">Tuesday</div>
+            <div class="calendar-day-header">Wednesday</div>
+            <div class="calendar-day-header">Thursday</div>
+            <div class="calendar-day-header">Friday</div>
+            <div class="calendar-day-header">Saturday</div>
+            
+            <!-- Calendar days -->
+            {% for date, day_logs in grouped_logs.items %}
+            <div class="calendar-day">
+                <div style="font-weight: bold;">{{ date|date:"M d" }}</div>
+                {% for log in day_logs %}
+                <div class="medicine-status">
+                    {% if log.taken %}
+                    <span class="check-icon">✓</span>
+                    {% else %}
+                    <span>❌</span>
+                    {% endif %}
+                    {{ log.medicine.name }}
+                </div>
+                {% endfor %}
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="message warning">
+            <p>You don't have any active medicines. Add one below!</p>
+        </div>
+        {% endif %}
+    {% elif view_type == 'monthly' %}
+        {% if grouped_logs %}
+        <div class="calendar-grid">
+            <!-- Day headers -->
+            <div class="calendar-day-header">Sunday</div>
+            <div class="calendar-day-header">Monday</div>
+            <div class="calendar-day-header">Tuesday</div>
+            <div class="calendar-day-header">Wednesday</div>
+            <div class="calendar-day-header">Thursday</div>
+            <div class="calendar-day-header">Friday</div>
+            <div class="calendar-day-header">Saturday</div>
+            
+            <!-- Calendar days -->
+            {% for date, day_logs in grouped_logs.items %}
+            <div class="calendar-day">
+                <div style="font-weight: bold;">{{ date|date:"M d" }}</div>
+                {% for log in day_logs %}
+                <div class="medicine-status">
+                    {% if log.taken %}
+                    <span class="check-icon">✓</span>
+                    {% else %}
+                    <span>❌</span>
+                    {% endif %}
+                    {{ log.medicine.name }}
+                </div>
+                {% endfor %}
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="message warning">
+            <p>You don't have any active medicines. Add one below!</p>
+        </div>
+        {% endif %}
+    {% endif %}
+</div>
+
+<div class="card">
+    <h2 class="mb-3">Add New Medicine</h2>
+    <form method="post" style="max-width: 500px; margin: 0 auto;">
+        {% csrf_token %}
+        <input type="hidden" name="add_medicine" value="1">
+        
+        {% for field in form %}
+        <div class="form-group">
+            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+            {{ field }}
+            {% if field.errors %}
+            <div class="error">
+                {{ field.errors }}
+            </div>
+            {% endif %}
+        </div>
+        {% endfor %}
+        
+        <button type="submit" class="btn btn-accent">Add Medicine</button>
+    </form>
+</div>
+{% endblock %}
