@@ -4,7 +4,7 @@
 
 {% block content %}
 {% load form_tags %}
-<div class="card bg-base-100 shadow-xl p-6 text-center">
+<div class="card bg-base-100 shadow-xl p-8 text-center">
 <div class="btn-group justify-center mb-8">
     <a href="{% url 'medicine_log' %}" class="btn {% if view_type == 'daily' %}btn-accent{% else %}btn-secondary{% endif %}">Daily</a>
     <a href="{% url 'weekly_log' %}" class="btn {% if view_type == 'weekly' %}btn-accent{% else %}btn-secondary{% endif %}">Weekly</a>
@@ -12,11 +12,11 @@
 </div>
 
     {% if view_type == 'daily' %}
-    <h2 class="text-2xl font-bold mb-4">Medicine Log for {{ today }}</h2>
+    <h2 class="text-2xl font-bold mb-6 text-primary">Medicine Log for {{ today }}</h2>
     {% elif view_type == 'weekly' %}
-    <h2 class="text-2xl font-bold mb-4">Weekly Medicine Log ({{ start_date|date:"M d" }} - {{ end_date|date:"M d, Y" }})</h2>
+    <h2 class="text-2xl font-bold mb-6 text-primary">Weekly Medicine Log ({{ start_date|date:"M d" }} - {{ end_date|date:"M d, Y" }})</h2>
     {% elif view_type == 'monthly' %}
-    <h2 class="text-2xl font-bold mb-4">Monthly Medicine Log ({{ month_name }} {{ year }})</h2>
+    <h2 class="text-2xl font-bold mb-6 text-primary">Monthly Medicine Log ({{ month_name }} {{ year }})</h2>
     {% endif %}
     
     {% if view_type == 'daily' %}
@@ -136,8 +136,8 @@
     {% endif %}
 </div>
 
-<div class="card bg-base-100 shadow-xl p-6 mt-8">
-    <h2 class="text-2xl font-bold mb-4 text-center">Add New Medicine</h2>
+<div class="card bg-base-100 shadow-xl p-8 mt-8">
+    <h2 class="text-2xl font-bold mb-6 text-center text-primary">Add New Medicine</h2>
     <form method="post" class="max-w-md mx-auto">
         {% csrf_token %}
         <input type="hidden" name="add_medicine" value="1">
@@ -156,7 +156,7 @@
         </div>
         {% endfor %}
         
-        <button type="submit" class="btn btn-accent w-full">Add Medicine</button>
+        <button type="submit" class="btn btn-accent w-full">ADD MEDICINE</button>
     </form>
 </div>
 {% endblock %}

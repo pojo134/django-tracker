@@ -11,4 +11,5 @@ urlpatterns = [
     path('mark_taken/<int:log_id>/', views.mark_taken, name='mark_taken'),
     path('add_medicine/', views.add_medicine, name='add_medicine'),
     path('deactivate_medicine/<int:medicine_id>/', views.deactivate_medicine, name='deactivate_medicine'),
+    path('set_theme/', views.set_theme, name='set_theme'),
 ]

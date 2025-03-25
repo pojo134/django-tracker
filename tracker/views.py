@@ -6,6 +6,7 @@ from .forms import MedicineForm
 from datetime import date, datetime, timedelta
 from django.utils import timezone
 import calendar
+from django.http import HttpResponseRedirect
 
 @login_required
 def medicine_log(request):
@@ -183,5 +184,23 @@ def deactivate_medicine(request, medicine_id):
         return redirect('weekly_log')
     elif 'monthly' in referer:
         return redirect('monthly_log')
+    else:
+        return redirect('medicine_log')
+
+def set_theme(request):
+    """
+    Set the theme preference in the session and redirect back to the previous page.
+    """
+    theme = request.GET.get('theme', 'medicine')
+    if theme not in ['medicine', 'campfire']:
+        theme = 'medicine'
+    
+    # Store theme preference in session
+    request.session['theme_preference'] = theme
+    
+    # Redirect back to the referring page or home
+    referer = request.META.get('HTTP_REFERER')
+    if referer:
+        return HttpResponseRedirect(referer)
     else:
         return redirect('medicine_log')

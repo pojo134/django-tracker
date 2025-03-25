@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="campfire">
+<html lang="en" data-theme="{% if theme_preference == 'campfire' %}campfire{% else %}medicine{% endif %}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,60 +11,419 @@
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <script>
         tailwind.config = {
-            daisyui: {
-                themes: [
-                    {
-                        light: {
-                            "primary": "#4a6fa5",
-                            "secondary": "#47b8e0",
-                            "accent": "#ff7e5f",
-                            "neutral": "#3d4451",
-                            "base-100": "#ffffff",
-                            "info": "#3abff8",
-                            "success": "#36d399",
-                            "warning": "#fbbd23",
-                            "error": "#f87272",
-                        },
-                    },
-                    {
-                        campfire: {
-                            "primary": "#e67e22",      // Warm campfire orange
-                            "secondary": "#2c3e50",    // Deep ocean blue
-                            "accent": "#ff6b35",       // Bright flames
-                            "neutral": "#1e2a3a",      // Night sky
-                            "base-100": "#0f1219",     // Dark sand/night
-                            "base-200": "#0a0d12",     // Darker sand/night
-                            "base-300": "#050709",     // Darkest sand/night
-                            "base-content": "#e0e0e0", // Text on dark background
-                            "info": "#3498db",         // Ocean water
-                            "success": "#2ecc71",      // Beach vegetation
-                            "warning": "#f1c40f",      // Ember glow
-                            "error": "#e74c3c",        // Hot coals
-                        },
-                    },
-                ],
+            theme: {
+                extend: {},
             },
+            plugins: [],
         }
     </script>
+    <style>
+        /* Medicine Theme */
+        .medicine {
+            --primary: #3b82f6;      /* Blue - Medical blue */
+            --primary-focus: #2563eb; /* Darker blue */
+            --primary-content: #ffffff;
+            --secondary: #06b6d4;    /* Cyan - Clean/sterile */
+            --secondary-focus: #0891b2; /* Darker cyan */
+            --secondary-content: #ffffff;
+            --accent: #8b5cf6;       /* Violet - Calming */
+            --accent-focus: #7c3aed; /* Darker violet */
+            --accent-content: #ffffff;
+            --neutral: #1e293b;      /* Slate-800 */
+            --neutral-focus: #0f172a; /* Slate-900 */
+            --neutral-content: #ffffff;
+            --base-100: #f8fafc;     /* Slate-50 - Clean white */
+            --base-200: #f1f5f9;     /* Slate-100 */
+            --base-300: #e2e8f0;     /* Slate-200 */
+            --base-content: #0f172a; /* Slate-900 */
+            --info: #0ea5e9;         /* Sky blue */
+            --info-content: #ffffff;
+            --success: #10b981;      /* Emerald */
+            --success-content: #ffffff;
+            --warning: #f59e0b;      /* Amber */
+            --warning-content: #ffffff;
+            --error: #ef4444;        /* Red */
+            --error-content: #ffffff;
+        }
+        
+        /* Campfire Theme */
+        .campfire {
+            --primary: #e67e22;      /* Warm campfire orange */
+            --primary-focus: #d35400; /* Darker orange */
+            --primary-content: #ffffff;
+            --secondary: #2c3e50;    /* Deep ocean blue */
+            --secondary-focus: #1a2530; /* Darker ocean blue */
+            --secondary-content: #ffffff;
+            --accent: #ff6b35;       /* Bright flames */
+            --accent-focus: #e74c3c; /* Darker flames */
+            --accent-content: #ffffff;
+            --neutral: #1e2a3a;      /* Night sky */
+            --neutral-focus: #0f1219; /* Darker night sky */
+            --neutral-content: #ffffff;
+            --base-100: #0f1219;     /* Dark sand/night */
+            --base-200: #0a0d12;     /* Darker sand/night */
+            --base-300: #050709;     /* Darkest sand/night */
+            --base-content: #e0e0e0; /* Text on dark background */
+            --info: #3498db;         /* Ocean water */
+            --info-content: #ffffff;
+            --success: #2ecc71;      /* Beach vegetation */
+            --success-content: #ffffff;
+            --warning: #f1c40f;      /* Ember glow */
+            --warning-content: #ffffff;
+            --error: #e74c3c;        /* Hot coals */
+            --error-content: #ffffff;
+        }
+        
+        /* Apply theme colors based on data-theme attribute */
+        :root {
+            --primary: var(--primary);
+            --primary-focus: var(--primary-focus);
+            --primary-content: var(--primary-content);
+            --secondary: var(--secondary);
+            --secondary-focus: var(--secondary-focus);
+            --secondary-content: var(--secondary-content);
+            --accent: var(--accent);
+            --accent-focus: var(--accent-focus);
+            --accent-content: var(--accent-content);
+            --neutral: var(--neutral);
+            --neutral-focus: var(--neutral-focus);
+            --neutral-content: var(--neutral-content);
+            --base-100: var(--base-100);
+            --base-200: var(--base-200);
+            --base-300: var(--base-300);
+            --base-content: var(--base-content);
+            --info: var(--info);
+            --info-content: var(--info-content);
+            --success: var(--success);
+            --success-content: var(--success-content);
+            --warning: var(--warning);
+            --warning-content: var(--warning-content);
+            --error: var(--error);
+            --error-content: var(--error-content);
+        }
+        
+        /* Set default theme */
+        html[data-theme="medicine"] {
+            --primary: #3b82f6;
+            --primary-focus: #2563eb;
+            --primary-content: #ffffff;
+            --secondary: #06b6d4;
+            --secondary-focus: #0891b2;
+            --secondary-content: #ffffff;
+            --accent: #8b5cf6;
+            --accent-focus: #7c3aed;
+            --accent-content: #ffffff;
+            --neutral: #1e293b;
+            --neutral-focus: #0f172a;
+            --neutral-content: #ffffff;
+            --base-100: #f8fafc;
+            --base-200: #f1f5f9;
+            --base-300: #e2e8f0;
+            --base-content: #0f172a;
+            --info: #0ea5e9;
+            --info-content: #ffffff;
+            --success: #10b981;
+            --success-content: #ffffff;
+            --warning: #f59e0b;
+            --warning-content: #ffffff;
+            --error: #ef4444;
+            --error-content: #ffffff;
+        }
+        
+        html[data-theme="campfire"] {
+            --primary: #e67e22;
+            --primary-focus: #d35400;
+            --primary-content: #ffffff;
+            --secondary: #2c3e50;
+            --secondary-focus: #1a2530;
+            --secondary-content: #ffffff;
+            --accent: #ff6b35;
+            --accent-focus: #e74c3c;
+            --accent-content: #ffffff;
+            --neutral: #1e2a3a;
+            --neutral-focus: #0f1219;
+            --neutral-content: #ffffff;
+            --base-100: #0f1219;
+            --base-200: #0a0d12;
+            --base-300: #050709;
+            --base-content: #e0e0e0;
+            --info: #3498db;
+            --info-content: #ffffff;
+            --success: #2ecc71;
+            --success-content: #ffffff;
+            --warning: #f1c40f;
+            --warning-content: #ffffff;
+            --error: #e74c3c;
+            --error-content: #ffffff;
+        }
+        
+        /* Apply theme colors */
+        .bg-primary { background-color: var(--primary); }
+        .text-primary { color: var(--primary); }
+        .bg-secondary { background-color: var(--secondary); }
+        .text-secondary { color: var(--secondary); }
+        .bg-accent { background-color: var(--accent); }
+        .text-accent { color: var(--accent); }
+        .bg-neutral { background-color: var(--neutral); }
+        .text-neutral { color: var(--neutral); }
+        .bg-base-100 { background-color: var(--base-100); }
+        .bg-base-200 { background-color: var(--base-200); }
+        .bg-base-300 { background-color: var(--base-300); }
+        .text-base-content { color: var(--base-content); }
+        .text-primary-content { color: var(--primary-content); }
+        .text-secondary-content { color: var(--secondary-content); }
+        .text-accent-content { color: var(--accent-content); }
+        .text-neutral-content { color: var(--neutral-content); }
+        .text-info { color: var(--info); }
+        .text-success { color: var(--success); }
+        .text-warning { color: var(--warning); }
+        .text-error { color: var(--error); }
+        
+        /* Button styles */
+        .btn {
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-size: 0.875rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary);
+            color: var(--primary-content);
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+        }
+        .btn-primary:hover {
+            background-color: var(--primary-focus);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        
+        .btn-secondary {
+            background-color: var(--secondary);
+            color: var(--secondary-content);
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+        }
+        .btn-secondary:hover {
+            background-color: var(--secondary-focus);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        
+        .btn-accent {
+            background-color: var(--accent);
+            color: var(--accent-content);
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+        }
+        .btn-accent:hover {
+            background-color: var(--accent-focus);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        
+        .btn-ghost {
+            background-color: transparent;
+        }
+        .btn-ghost:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        
+        /* Form styles */
+        .input-bordered {
+            border: 1px solid var(--base-300);
+        }
+        .input-bordered:focus {
+            border-color: var(--primary);
+            outline: none;
+        }
+        
+        /* Card styles */
+        .card {
+            border-radius: 0.75rem;
+            overflow: hidden;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            transition: all 0.3s ease;
+        }
+        
+        .card:hover {
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        
+        .card-body {
+            padding: 1.5rem;
+        }
+        
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+        }
+        
+        /* Link styles */
+        .link-primary {
+            color: var(--primary);
+            text-decoration: underline;
+        }
+        .link-primary:hover {
+            color: var(--primary-focus);
+        }
+        
+        /* Form control styles */
+        .form-control {
+            margin-bottom: 1rem;
+        }
+        .label {
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+        .label-text {
+            font-weight: 500;
+        }
+        .input {
+            width: 100%;
+            padding: 0.75rem;
+            border-radius: 0.375rem;
+            background-color: var(--base-100);
+            color: var(--base-content);
+        }
+        
+        /* Alert styles */
+        .alert {
+            padding: 1rem;
+            border-radius: 0.375rem;
+            margin-bottom: 1rem;
+        }
+        .alert-success {
+            background-color: var(--success);
+            color: var(--success-content);
+        }
+        .alert-warning {
+            background-color: var(--warning);
+            color: var(--warning-content);
+        }
+        .alert-error {
+            background-color: var(--error);
+            color: var(--error-content);
+        }
+        .alert-info {
+            background-color: var(--info);
+            color: var(--info-content);
+        }
+        
+        /* Dropdown styles */
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+        
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            right: 0;
+            min-width: 200px;
+            background-color: var(--base-100);
+            border-radius: 0.375rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            z-index: 1;
+            overflow: hidden;
+        }
+        
+        .dropdown-content.show {
+            display: block;
+        }
+        
+        .dropdown-content a {
+            color: var(--base-content);
+            padding: 0.75rem 1rem;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .dropdown-content a:hover {
+            background-color: var(--base-200);
+        }
+        
+        .dropdown:focus-within .dropdown-content {
+            display: block;
+        }
+        
+        .menu {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .menu li {
+            margin: 0;
+        }
+    </style>
     {% block extra_styles %}{% endblock %}
 </head>
-<body class="min-h-screen bg-base-200">
+<body class="min-h-screen bg-base-100 text-base-content">
     <div class="container mx-auto px-4 py-8 max-w-6xl">
         {% block navbar %}
         <div class="navbar bg-primary text-primary-content rounded-box mb-8 shadow-lg">
             <div class="flex-1">
-                <h1 class="text-xl font-bold">💊 Medicine Tracker</h1>
+                <h1 class="text-xl font-bold text-white">💊 Medicine Tracker</h1>
             </div>
             <div class="flex-none">
                 {% if user.is_authenticated %}
                 <div class="flex items-center gap-4">
-                    <span>Welcome, {{ user.username }}</span>
-                    <a href="{% url 'logout' %}" class="btn btn-ghost hover:btn-accent">Logout</a>
+                    <span class="text-white">Welcome, {{ user.username }}</span>
+                    <div class="dropdown dropdown-end">
+                        <label tabindex="0" class="btn btn-ghost text-white">
+                            <span class="material-icons">palette</span>
+                            <span class="ml-1">Theme</span>
+                        </label>
+                        <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52">
+                            <li>
+                                <a href="{% url 'set_theme' %}?theme=medicine" class="{% if theme_preference != 'campfire' %}text-primary font-bold{% else %}text-base-content{% endif %}">
+                                    <span class="material-icons">medical_services</span>
+                                    Medicine
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{% url 'set_theme' %}?theme=campfire" class="{% if theme_preference == 'campfire' %}text-primary font-bold{% else %}text-base-content{% endif %}">
+                                    <span class="material-icons">local_fire_department</span>
+                                    Campfire
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                    <a href="{% url 'logout' %}" class="btn btn-ghost text-white hover:bg-accent hover:text-white">Logout</a>
                 </div>
                 {% else %}
                 <div class="flex gap-2">
-                    <a href="{% url 'login' %}" class="btn btn-ghost hover:btn-accent">Login</a>
-                    <a href="{% url 'register' %}" class="btn btn-primary">Register</a>
+                    <div class="dropdown dropdown-end">
+                        <label tabindex="0" class="btn btn-ghost text-white">
+                            <span class="material-icons">palette</span>
+                            <span class="ml-1">Theme</span>
+                        </label>
+                        <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52">
+                            <li>
+                                <a href="{% url 'set_theme' %}?theme=medicine" class="{% if theme_preference != 'campfire' %}text-primary font-bold{% else %}text-base-content{% endif %}">
+                                    <span class="material-icons">medical_services</span>
+                                    Medicine
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{% url 'set_theme' %}?theme=campfire" class="{% if theme_preference == 'campfire' %}text-primary font-bold{% else %}text-base-content{% endif %}">
+                                    <span class="material-icons">local_fire_department</span>
+                                    Campfire
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                    <a href="{% url 'login' %}" class="btn btn-ghost text-white hover:bg-accent hover:text-white">Login</a>
+                    <a href="{% url 'register' %}" class="btn btn-secondary text-white">Register</a>
                 </div>
                 {% endif %}
             </div>
@@ -74,14 +433,35 @@
         {% if messages %}
         <div class="space-y-2 mb-8">
             {% for message in messages %}
-                <div class="alert alert-{% if message.tags == 'success' %}success{% elif message.tags == 'warning' %}warning{% elif message.tags == 'error' %}error{% else %}info{% endif %}">
+                <div class="alert alert-{% if message.tags == 'success' %}success{% elif message.tags == 'warning' %}warning{% elif message.tags == 'error' %}error{% else %}info{% endif %} text-base-content">
                     <span>{{ message }}</span>
                 </div>
             {% endfor %}
         </div>
         {% endif %}
 
-        {% block content %}{% endblock %}
+        {% block content %}
+        <div class="tabs tabs-boxed bg-neutral text-neutral-content">
+            <a class="tab {% if active_tab == 'daily' %}tab-active{% endif %}">Daily</a>
+            <a class="tab {% if active_tab == 'weekly' %}tab-active{% endif %}">Weekly</a>
+            <a class="tab {% if active_tab == 'monthly' %}tab-active{% endif %}">Monthly</a>
+        </div>
+        <div class="card bg-base-100 shadow-lg mt-8">
+            <div class="card-body">
+                <h2 class="card-title text-primary">Weekly Medicine Log (Mar 24 - Mar 30, 2025)</h2>
+                <div class="grid grid-cols-7 gap-4">
+                    <div class="card bg-base-200 text-base-content">
+                        <div class="card-body">
+                            <h3 class="text-accent">Sunday</h3>
+                            <p>Mar 24</p>
+                            <p class="text-success">✔ 1</p>
+                        </div>
+                    </div>
+                    <!-- Repeat similar structure for other days -->
+                </div>
+            </div>
+        </div>
+        {% endblock %}
     </div>
 
     {% block extra_scripts %}{% endblock %}
