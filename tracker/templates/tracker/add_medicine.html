@@ -3,27 +3,30 @@
 {% block title %}Add Medicine | Medicine Tracker{% endblock %}
 
 {% block content %}
-<div class="card">
-    <h2 class="text-center mb-3">Add New Medicine</h2>
+{% load form_tags %}
+<div class="card bg-base-100 shadow-xl p-6 max-w-md mx-auto">
+    <h2 class="text-2xl font-bold text-center mb-4">Add New Medicine</h2>
     
-    <form method="post">
+    <form method="post" class="space-y-4">
         {% csrf_token %}
         
         {% for field in form %}
-        <div class="form-group">
-            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-            {{ field }}
+        <div class="form-control">
+            <label class="label" for="{{ field.id_for_label }}">
+                <span class="label-text font-medium">{{ field.label }}</span>
+            </label>
+            {{ field|add_class:"input input-bordered w-full focus:input-primary" }}
             {% if field.errors %}
-            <div class="error">
+            <div class="text-error text-sm mt-1">
                 {{ field.errors }}
             </div>
             {% endif %}
         </div>
         {% endfor %}
         
-        <div class="medicine-actions">
-            <button type="submit" class="btn btn-accent">Add Medicine</button>
-            <a href="{% url 'medicine_log' %}" class="btn btn-secondary">Cancel</a>
+        <div class="flex justify-center gap-4 mt-6">
+            <button type="submit" class="btn btn-accent flex-1">Add Medicine</button>
+            <a href="{% url 'medicine_log' %}" class="btn btn-secondary flex-1">Cancel</a>
         </div>
     </form>
 </div>

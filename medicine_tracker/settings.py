@@ -17,6 +17,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',  # Add this line
     'tracker',
     'users',  # Add this line
+    'templatetags',  # Add custom templatetags app
 ]
 
 MIDDLEWARE = [

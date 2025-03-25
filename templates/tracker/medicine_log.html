@@ -2,259 +2,161 @@
 
 {% block title %}Medicine Log | Medicine Tracker{% endblock %}
 
-{% block extra_styles %}
-<style>
-    /* Center all elements */
-    .card {
-        text-align: center;
-    }
-    
-    h2, h3, h4 {
-        text-align: center;
-    }
-    
-    /* Calendar grid styles */
-    .calendar-grid {
-        display: grid;
-        grid-template-columns: repeat(7, 1fr);
-        gap: 10px;
-        margin: 0 auto;
-        max-width: 100%;
-    }
-    
-    .calendar-day {
-        border: 1px solid #ddd;
-        border-radius: var(--border-radius);
-        padding: 10px;
-        min-height: 100px;
-        background-color: white;
-    }
-    
-    .calendar-day-header {
-        font-weight: bold;
-        margin-bottom: 5px;
-        background-color: var(--primary-color);
-        color: white;
-        padding: 5px;
-        border-radius: 4px;
-    }
-    
-    .medicine-status {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin: 5px 0;
-    }
-    
-    .check-icon {
-        color: var(--success-color);
-        font-size: 1.2rem;
-        margin-right: 5px;
-    }
-    
-    .medicine-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-        gap: 1.5rem;
-        margin: 0 auto;
-        max-width: 1000px;
-    }
-    
-    /* Responsive adjustments */
-    @media (max-width: 768px) {
-        .calendar-grid {
-            grid-template-columns: repeat(1, 1fr);
-        }
-        
-        .nav-buttons {
-            flex-direction: column;
-            align-items: center;
-        }
-        
-        .nav-buttons a {
-            margin: 5px 0;
-            width: 80%;
-        }
-    }
-    
-    /* Navigation buttons */
-    .nav-buttons {
-        display: flex;
-        justify-content: center;
-        margin-bottom: 30px;
-        flex-wrap: wrap;
-    }
-    
-    .nav-buttons a {
-        display: inline-block;
-        margin: 0 10px;
-        padding: 15px 30px;
-        color: white;
-        text-decoration: none;
-        border-radius: 8px;
-        font-weight: bold;
-        font-size: 1.2rem;
-        transition: transform 0.2s;
-    }
-    
-    .nav-buttons a:hover {
-        transform: translateY(-3px);
-    }
-</style>
-{% endblock %}
-
 {% block content %}
-<!-- Debug info -->
-<div style="background-color: #f0f0f0; padding: 10px; margin-bottom: 10px; border: 1px solid #ccc; text-align: center;">
-    <p><strong>Debug:</strong> View Type: {{ view_type }}</p>
-</div>
-
-<div class="card">
-<div class="nav-buttons">
-    <a href="{% url 'medicine_log' %}" style="background-color: {% if view_type == 'daily' %}#ff7e5f{% else %}#47b8e0{% endif %};">Daily</a>
-    <a href="{% url 'weekly_log' %}" style="background-color: {% if view_type == 'weekly' %}#ff7e5f{% else %}#47b8e0{% endif %};">Weekly</a>
-    <a href="{% url 'monthly_log' %}" style="background-color: {% if view_type == 'monthly' %}#ff7e5f{% else %}#47b8e0{% endif %};">Monthly</a>
+{% load form_tags %}
+<div class="card bg-base-100 shadow-xl p-6 text-center">
+<div class="btn-group justify-center mb-8">
+    <a href="{% url 'medicine_log' %}" class="btn {% if view_type == 'daily' %}btn-accent{% else %}btn-secondary{% endif %}">Daily</a>
+    <a href="{% url 'weekly_log' %}" class="btn {% if view_type == 'weekly' %}btn-accent{% else %}btn-secondary{% endif %}">Weekly</a>
+    <a href="{% url 'monthly_log' %}" class="btn {% if view_type == 'monthly' %}btn-accent{% else %}btn-secondary{% endif %}">Monthly</a>
 </div>
 
     {% if view_type == 'daily' %}
-    <h2 class="mb-3">Medicine Log for {{ today }}</h2>
+    <h2 class="text-2xl font-bold mb-4">Medicine Log for {{ today }}</h2>
     {% elif view_type == 'weekly' %}
-    <h2 class="mb-3">Weekly Medicine Log ({{ start_date|date:"M d" }} - {{ end_date|date:"M d, Y" }})</h2>
+    <h2 class="text-2xl font-bold mb-4">Weekly Medicine Log ({{ start_date|date:"M d" }} - {{ end_date|date:"M d, Y" }})</h2>
     {% elif view_type == 'monthly' %}
-    <h2 class="mb-3">Monthly Medicine Log ({{ month_name }} {{ year }})</h2>
+    <h2 class="text-2xl font-bold mb-4">Monthly Medicine Log ({{ month_name }} {{ year }})</h2>
     {% endif %}
     
     {% if view_type == 'daily' %}
         {% if logs %}
-        <div class="medicine-grid">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
             {% for log in logs %}
-            <div class="medicine-item {% if log.taken %}taken{% else %}not-taken{% endif %}">
-                <h3>{{ log.medicine.name }}</h3>
-                <p><strong>Dosage:</strong> {{ log.medicine.dosage }}</p>
-                <p class="mb-0"><strong>Status:</strong> 
-                    {% if log.taken %}
-                    <span class="success">✓ Taken</span>
-                    {% else %}
-                    <span class="error">Not Taken</span>
-                    {% endif %}
-                </p>
-                
-                <div class="text-center mt-2">
-                    <form method="post" action="{% url 'deactivate_medicine' log.medicine.id %}">
-                        {% csrf_token %}
-                        <button type="submit" class="btn btn-danger btn-sm" style="font-size: 0.75rem; padding: 0.25rem 0.75rem;" title="Remove Medicine">
-                            <i class="material-icons" style="font-size: 12px; vertical-align: middle; margin-right: 2px;">close</i>
-                            <span style="vertical-align: middle;">Remove</span>
-                        </button>
-                    </form>
-                </div>
-                
-                <div class="medicine-actions" style="margin-top: 10px; display: flex; justify-content: center;">
+            <div class="card bg-base-100 shadow-md {% if log.taken %}border-l-4 border-success{% else %}border-l-4 border-error{% endif %}">
+                <div class="card-body">
+                    <h3 class="card-title">{{ log.medicine.name }}</h3>
+                    <p><strong>Dosage:</strong> {{ log.medicine.dosage }}</p>
+                    <p class="mb-0"><strong>Status:</strong> 
+                        {% if log.taken %}
+                        <span class="text-success">✓ Taken</span>
+                        {% else %}
+                        <span class="text-error">Not Taken</span>
+                        {% endif %}
+                    </p>
+                    
+                    <div class="card-actions justify-center mt-2">
+                        <form method="post" action="{% url 'deactivate_medicine' log.medicine.id %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-error btn-sm">
+                                <i class="material-icons text-xs">close</i>
+                                Remove
+                            </button>
+                        </form>
+                    </div>
+                    
                     {% if not log.taken %}
-                    <form method="post" action="{% url 'mark_taken' log.id %}">
-                        {% csrf_token %}
-                        <button type="submit" class="btn btn-accent" style="width: 180px; padding: 10px;">Mark as Taken</button>
-                    </form>
+                    <div class="card-actions justify-center mt-4">
+                        <form method="post" action="{% url 'mark_taken' log.id %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-accent">Mark as Taken</button>
+                        </form>
+                    </div>
                     {% endif %}
                 </div>
             </div>
             {% endfor %}
         </div>
         {% else %}
-        <div class="message warning">
-            <p>You don't have any active medicines. Add one below!</p>
+        <div class="alert alert-warning mx-auto max-w-md">
+            <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+            <span>You don't have any active medicines. Add one below!</span>
         </div>
         {% endif %}
     {% elif view_type == 'weekly' %}
         {% if grouped_logs %}
-        <div class="calendar-grid">
+        <div class="grid grid-cols-1 md:grid-cols-7 gap-2 max-w-full">
             <!-- Day headers -->
-            <div class="calendar-day-header">Sunday</div>
-            <div class="calendar-day-header">Monday</div>
-            <div class="calendar-day-header">Tuesday</div>
-            <div class="calendar-day-header">Wednesday</div>
-            <div class="calendar-day-header">Thursday</div>
-            <div class="calendar-day-header">Friday</div>
-            <div class="calendar-day-header">Saturday</div>
+            <div class="bg-primary text-primary-content p-2 font-bold rounded-t-box">Sunday</div>
+            <div class="bg-primary text-primary-content p-2 font-bold">Monday</div>
+            <div class="bg-primary text-primary-content p-2 font-bold">Tuesday</div>
+            <div class="bg-primary text-primary-content p-2 font-bold">Wednesday</div>
+            <div class="bg-primary text-primary-content p-2 font-bold">Thursday</div>
+            <div class="bg-primary text-primary-content p-2 font-bold">Friday</div>
+            <div class="bg-primary text-primary-content p-2 font-bold rounded-t-box">Saturday</div>
             
             <!-- Calendar days -->
             {% for date, day_logs in grouped_logs.items %}
-            <div class="calendar-day">
-                <div style="font-weight: bold;">{{ date|date:"M d" }}</div>
+            <div class="bg-base-100 p-2 border border-base-200 min-h-24">
+                <div class="font-bold">{{ date|date:"M d" }}</div>
                 {% for log in day_logs %}
-                <div class="medicine-status">
+                <div class="flex items-center gap-1 my-1">
                     {% if log.taken %}
-                    <span class="check-icon">✓</span>
+                    <span class="text-success">✓</span>
                     {% else %}
-                    <span>❌</span>
+                    <span class="text-error">❌</span>
                     {% endif %}
-                    {{ log.medicine.name }}
+                    <span>{{ log.medicine.name }}</span>
                 </div>
                 {% endfor %}
             </div>
             {% endfor %}
         </div>
         {% else %}
-        <div class="message warning">
-            <p>You don't have any active medicines. Add one below!</p>
+        <div class="alert alert-warning mx-auto max-w-md">
+            <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+            <span>You don't have any active medicines. Add one below!</span>
         </div>
         {% endif %}
     {% elif view_type == 'monthly' %}
         {% if grouped_logs %}
-        <div class="calendar-grid">
+        <div class="grid grid-cols-1 md:grid-cols-7 gap-2 max-w-full">
             <!-- Day headers -->
-            <div class="calendar-day-header">Sunday</div>
-            <div class="calendar-day-header">Monday</div>
-            <div class="calendar-day-header">Tuesday</div>
-            <div class="calendar-day-header">Wednesday</div>
-            <div class="calendar-day-header">Thursday</div>
-            <div class="calendar-day-header">Friday</div>
-            <div class="calendar-day-header">Saturday</div>
+            <div class="bg-primary text-primary-content p-2 font-bold rounded-t-box">Sunday</div>
+            <div class="bg-primary text-primary-content p-2 font-bold">Monday</div>
+            <div class="bg-primary text-primary-content p-2 font-bold">Tuesday</div>
+            <div class="bg-primary text-primary-content p-2 font-bold">Wednesday</div>
+            <div class="bg-primary text-primary-content p-2 font-bold">Thursday</div>
+            <div class="bg-primary text-primary-content p-2 font-bold">Friday</div>
+            <div class="bg-primary text-primary-content p-2 font-bold rounded-t-box">Saturday</div>
             
             <!-- Calendar days -->
             {% for date, day_logs in grouped_logs.items %}
-            <div class="calendar-day">
-                <div style="font-weight: bold;">{{ date|date:"M d" }}</div>
+            <div class="bg-base-100 p-2 border border-base-200 min-h-24">
+                <div class="font-bold">{{ date|date:"M d" }}</div>
                 {% for log in day_logs %}
-                <div class="medicine-status">
+                <div class="flex items-center gap-1 my-1">
                     {% if log.taken %}
-                    <span class="check-icon">✓</span>
+                    <span class="text-success">✓</span>
                     {% else %}
-                    <span>❌</span>
+                    <span class="text-error">❌</span>
                     {% endif %}
-                    {{ log.medicine.name }}
+                    <span>{{ log.medicine.name }}</span>
                 </div>
                 {% endfor %}
             </div>
             {% endfor %}
         </div>
         {% else %}
-        <div class="message warning">
-            <p>You don't have any active medicines. Add one below!</p>
+        <div class="alert alert-warning mx-auto max-w-md">
+            <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+            <span>You don't have any active medicines. Add one below!</span>
         </div>
         {% endif %}
     {% endif %}
 </div>
 
-<div class="card">
-    <h2 class="mb-3">Add New Medicine</h2>
-    <form method="post" style="max-width: 500px; margin: 0 auto;">
+<div class="card bg-base-100 shadow-xl p-6 mt-8">
+    <h2 class="text-2xl font-bold mb-4 text-center">Add New Medicine</h2>
+    <form method="post" class="max-w-md mx-auto">
         {% csrf_token %}
         <input type="hidden" name="add_medicine" value="1">
         
         {% for field in form %}
-        <div class="form-group">
-            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-            {{ field }}
+        <div class="form-control mb-4">
+            <label class="label" for="{{ field.id_for_label }}">
+                <span class="label-text font-medium">{{ field.label }}</span>
+            </label>
+            {{ field|add_class:"input input-bordered w-full focus:input-primary" }}
             {% if field.errors %}
-            <div class="error">
+            <div class="text-error text-sm mt-1">
                 {{ field.errors }}
             </div>
             {% endif %}
         </div>
         {% endfor %}
         
-        <button type="submit" class="btn btn-accent">Add Medicine</button>
+        <button type="submit" class="btn btn-accent w-full">Add Medicine</button>
     </form>
 </div>
 {% endblock %}

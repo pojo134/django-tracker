@@ -1,285 +1,81 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="campfire">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Medicine Tracker{% endblock %}</title>
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- daisyUI -->
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@3.9.4/dist/full.css" rel="stylesheet" type="text/css" />
+    <script src="https://cdn.tailwindcss.com"></script>
     <!-- Material Icons -->
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    <style>
-        :root {
-            --primary-color: #4a6fa5;
-            --primary-dark: #3a5a80;
-            --secondary-color: #47b8e0;
-            --accent-color: #ff7e5f;
-            --light-bg: #f5f7fa;
-            --card-bg: #ffffff;
-            --text-color: #333333;
-            --text-light: #666666;
-            --success-color: #66bb6a;
-            --warning-color: #ffa726;
-            --danger-color: #ef5350;
-            --border-radius: 8px;
-            --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            --transition: all 0.3s ease;
+    <script>
+        tailwind.config = {
+            daisyui: {
+                themes: [
+                    {
+                        light: {
+                            "primary": "#4a6fa5",
+                            "secondary": "#47b8e0",
+                            "accent": "#ff7e5f",
+                            "neutral": "#3d4451",
+                            "base-100": "#ffffff",
+                            "info": "#3abff8",
+                            "success": "#36d399",
+                            "warning": "#fbbd23",
+                            "error": "#f87272",
+                        },
+                    },
+                    {
+                        campfire: {
+                            "primary": "#e67e22",      // Warm campfire orange
+                            "secondary": "#2c3e50",    // Deep ocean blue
+                            "accent": "#ff6b35",       // Bright flames
+                            "neutral": "#1e2a3a",      // Night sky
+                            "base-100": "#0f1219",     // Dark sand/night
+                            "base-200": "#0a0d12",     // Darker sand/night
+                            "base-300": "#050709",     // Darkest sand/night
+                            "base-content": "#e0e0e0", // Text on dark background
+                            "info": "#3498db",         // Ocean water
+                            "success": "#2ecc71",      // Beach vegetation
+                            "warning": "#f1c40f",      // Ember glow
+                            "error": "#e74c3c",        // Hot coals
+                        },
+                    },
+                ],
+            },
         }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--light-bg);
-            color: var(--text-color);
-            line-height: 1.6;
-        }
-
-        .container {
-            width: 100%;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-
-        .navbar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background-color: var(--primary-color);
-            color: white;
-            padding: 1rem;
-            border-radius: var(--border-radius);
-            margin-bottom: 2rem;
-            box-shadow: var(--box-shadow);
-        }
-
-        .navbar a {
-            color: white;
-            text-decoration: none;
-            margin-left: 1rem;
-            transition: var(--transition);
-        }
-
-        .navbar a:hover {
-            color: var(--secondary-color);
-        }
-
-        .card {
-            background-color: var(--card-bg);
-            border-radius: var(--border-radius);
-            box-shadow: var(--box-shadow);
-            padding: 2rem;
-            margin-bottom: 2rem;
-            transition: var(--transition);
-        }
-
-        .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
-        }
-
-        .form-group {
-            margin-bottom: 1.5rem;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 0.5rem;
-            font-weight: 500;
-        }
-
-        input, select, textarea {
-            width: 100%;
-            padding: 0.75rem;
-            border: 1px solid #ddd;
-            border-radius: var(--border-radius);
-            font-size: 1rem;
-            transition: var(--transition);
-        }
-
-        input:focus, select:focus, textarea:focus {
-            outline: none;
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(74, 111, 165, 0.2);
-        }
-
-        .btn {
-            display: inline-block;
-            padding: 0.75rem 1.5rem;
-            background-color: var(--primary-color);
-            color: white;
-            border: none;
-            border-radius: var(--border-radius);
-            cursor: pointer;
-            font-size: 1rem;
-            font-weight: 500;
-            text-align: center;
-            text-decoration: none;
-            transition: var(--transition);
-        }
-
-        .btn:hover {
-            background-color: var(--primary-dark);
-            transform: translateY(-2px);
-        }
-
-        .btn-secondary {
-            background-color: var(--secondary-color);
-        }
-
-        .btn-secondary:hover {
-            background-color: #3da8cc;
-        }
-
-        .btn-accent {
-            background-color: var(--accent-color);
-        }
-
-        .btn-accent:hover {
-            background-color: #ff6a45;
-        }
-
-        .btn-danger {
-            background-color: var(--danger-color);
-        }
-
-        .btn-danger:hover {
-            background-color: #e53935;
-        }
-
-        .btn-warning {
-            background-color: var(--warning-color);
-        }
-
-        .btn-warning:hover {
-            background-color: #f57c00;
-        }
-
-        .btn-sm {
-            padding: 0.5rem 1rem;
-            font-size: 0.875rem;
-        }
-
-        .messages {
-            margin-bottom: 2rem;
-        }
-
-        .message {
-            padding: 1rem;
-            border-radius: var(--border-radius);
-            margin-bottom: 0.5rem;
-        }
-
-        .success {
-            background-color: rgba(102, 187, 106, 0.2);
-            color: #2e7d32;
-            border-left: 4px solid var(--success-color);
-        }
-
-        .warning {
-            background-color: rgba(255, 167, 38, 0.2);
-            color: #ef6c00;
-            border-left: 4px solid var(--warning-color);
-        }
-
-        .error {
-            background-color: rgba(239, 83, 80, 0.2);
-            color: #c62828;
-            border-left: 4px solid var(--danger-color);
-        }
-
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 1.5rem;
-        }
-
-        .medicine-item {
-            border-radius: var(--border-radius);
-            padding: 1.5rem;
-            box-shadow: var(--box-shadow);
-            transition: var(--transition);
-        }
-
-        .medicine-item:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
-        }
-
-        .taken {
-            background-color: rgba(102, 187, 106, 0.2);
-            border-left: 4px solid var(--success-color);
-        }
-
-        .not-taken {
-            background-color: rgba(239, 83, 80, 0.2);
-            border-left: 4px solid var(--danger-color);
-        }
-
-        .medicine-actions {
-            display: flex;
-            gap: 0.5rem;
-            margin-top: 1rem;
-        }
-
-        .text-center {
-            text-align: center;
-        }
-
-        .mt-1 { margin-top: 0.5rem; }
-        .mt-2 { margin-top: 1rem; }
-        .mt-3 { margin-top: 1.5rem; }
-        .mt-4 { margin-top: 2rem; }
-        .mb-1 { margin-bottom: 0.5rem; }
-        .mb-2 { margin-bottom: 1rem; }
-        .mb-3 { margin-bottom: 1.5rem; }
-        .mb-4 { margin-bottom: 2rem; }
-
-        /* Responsive adjustments */
-        @media (max-width: 768px) {
-            .grid {
-                grid-template-columns: 1fr;
-            }
-
-            .navbar {
-                flex-direction: column;
-                text-align: center;
-            }
-
-            .navbar div {
-                margin-top: 1rem;
-            }
-        }
-    </style>
+    </script>
     {% block extra_styles %}{% endblock %}
 </head>
-<body>
-    <div class="container">
+<body class="min-h-screen bg-base-200">
+    <div class="container mx-auto px-4 py-8 max-w-6xl">
         {% block navbar %}
-        <div class="navbar">
-            <h1>Medicine Tracker</h1>
-            <div>
+        <div class="navbar bg-neutral text-neutral-content rounded-box mb-8 shadow-lg">
+            <div class="flex-1">
+                <h1 class="text-xl font-bold">Medicine Tracker</h1>
+            </div>
+            <div class="flex-none">
                 {% if user.is_authenticated %}
-                <span>Welcome, {{ user.username }}</span>
-                <a href="{% url 'logout' %}">Logout</a>
+                <div class="flex items-center gap-4">
+                    <span>Welcome, {{ user.username }}</span>
+                    <a href="{% url 'logout' %}" class="btn btn-ghost hover:btn-accent">Logout</a>
+                </div>
                 {% else %}
-                <a href="{% url 'login' %}">Login</a>
-                <a href="{% url 'register' %}">Register</a>
+                <div class="flex gap-2">
+                    <a href="{% url 'login' %}" class="btn btn-ghost hover:btn-accent">Login</a>
+                    <a href="{% url 'register' %}" class="btn btn-primary">Register</a>
+                </div>
                 {% endif %}
             </div>
         </div>
         {% endblock %}
 
         {% if messages %}
-        <div class="messages">
+        <div class="space-y-2 mb-8">
             {% for message in messages %}
-                <div class="message {% if message.tags %}{{ message.tags }}{% endif %}">
-                    {{ message }}
+                <div class="alert alert-{% if message.tags == 'success' %}success{% elif message.tags == 'warning' %}warning{% elif message.tags == 'error' %}error{% else %}info{% endif %}">
+                    <span>{{ message }}</span>
                 </div>
             {% endfor %}
         </div>
