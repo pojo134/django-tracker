@@ -25,13 +25,15 @@
             {% for log in logs %}
             <div class="card bg-base-100 shadow-md {% if log.taken %}border-l-4 border-success{% else %}border-l-4 border-error{% endif %}">
                 <div class="card-body">
-                    <h3 class="card-title">{{ log.medicine.name }}</h3>
-                    <p><strong>Dosage:</strong> {{ log.medicine.dosage }}</p>
-                    <p class="mb-0"><strong>Status:</strong> 
-                        {% if log.taken %}
-                        <span class="text-success">✓ Taken</span>
+                    <h3 class="card-title text-center">{{ log.medicine.name }}</h3>
+                    <p><strong>Dosage:</strong> {{ log.medicine.dosage }} {{ log.medicine.get_frequency_display }}</p>
+                    <p class="mb-0"><strong>Status:</strong>
+                        {% if log.is_complete %}
+                        <span class="text-success">✓ Completed ({{ log.taken }}/{{ log.medicine.dose_count }})</span>
+                        {% elif log.taken > 0 %}
+                        <span class="text-warning">In Progress ({{ log.taken }}/{{ log.medicine.dose_count }})</span>
                         {% else %}
-                        <span class="text-error">Not Taken</span>
+                        <span class="text-error">Not Started (0/{{ log.medicine.dose_count }})</span>
                         {% endif %}
                     </p>
                     
@@ -45,7 +47,7 @@
                         </form>
                     </div>
                     
-                    {% if not log.taken %}
+                    {% if not log.is_complete %}
                     <div class="card-actions justify-center mt-4">
                         <form method="post" action="{% url 'mark_taken' log.id %}">
                             {% csrf_token %}
@@ -81,12 +83,14 @@
                 <div class="font-bold">{{ date|date:"M d" }}</div>
                 {% for log in day_logs %}
                 <div class="flex items-center gap-1 my-1">
-                    {% if log.taken %}
+                    {% if log.is_complete %}
                     <span class="text-success">✓</span>
+                    {% elif log.taken > 0 %}
+                    <span class="text-warning">↻</span>
                     {% else %}
                     <span class="text-error">❌</span>
                     {% endif %}
-                    <span>{{ log.medicine.name }}</span>
+                    <span>{{ log.medicine.name }} ({{ log.taken }}/{{ log.medicine.dose_count }})</span>
                 </div>
                 {% endfor %}
             </div>
@@ -116,12 +120,14 @@
                 <div class="font-bold">{{ date|date:"M d" }}</div>
                 {% for log in day_logs %}
                 <div class="flex items-center gap-1 my-1">
-                    {% if log.taken %}
+                    {% if log.is_complete %}
                     <span class="text-success">✓</span>
+                    {% elif log.taken > 0 %}
+                    <span class="text-warning">↻</span>
                     {% else %}
                     <span class="text-error">❌</span>
                     {% endif %}
-                    <span>{{ log.medicine.name }}</span>
+                    <span>{{ log.medicine.name }} ({{ log.taken }}/{{ log.medicine.dose_count }})</span>
                 </div>
                 {% endfor %}
             </div>
@@ -142,19 +148,44 @@
         {% csrf_token %}
         <input type="hidden" name="add_medicine" value="1">
         
-        {% for field in form %}
-        <div class="form-control mb-4">
-            <label class="label" for="{{ field.id_for_label }}">
-                <span class="label-text font-medium">{{ field.label }}</span>
-            </label>
-            {{ field|add_class:"input input-bordered w-full focus:input-primary" }}
-            {% if field.errors %}
-            <div class="text-error text-sm mt-1">
-                {{ field.errors }}
+        <!-- Name and Dosage -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+            <div class="form-control">
+                <label class="label" for="{{ form.name.id_for_label }}">
+                    <span class="label-text font-medium">{{ form.name.label }}</span>
+                </label>
+                {{ form.name|add_class:"input input-bordered w-full focus:input-primary" }}
             </div>
-            {% endif %}
+            <div class="form-control">
+                <label class="label" for="{{ form.dosage.id_for_label }}">
+                    <span class="label-text font-medium">{{ form.dosage.label }}</span>
+                </label>
+                {{ form.dosage|add_class:"input input-bordered w-full focus:input-primary" }}
+            </div>
         </div>
-        {% endfor %}
+        
+        <!-- Frequency -->
+        <div class="form-control mb-4">
+            <label class="label">
+                <span class="label-text font-medium">Frequency</span>
+            </label>
+            <div class="flex flex-wrap gap-4">
+                {% for choice in form.frequency %}
+                <label class="flex items-center gap-2 cursor-pointer">
+                    {{ choice.tag }}
+                    <span class="label-text">{{ choice.choice_label }}</span>
+                </label>
+                {% endfor %}
+            </div>
+        </div>
+        
+        <!-- Dose Count -->
+        <div class="form-control mb-6">
+            <label class="label" for="{{ form.dose_count.id_for_label }}">
+                <span class="label-text font-medium">{{ form.dose_count.label }}</span>
+            </label>
+            {{ form.dose_count|add_class:"input input-bordered w-full focus:input-primary" }}
+        </div>
         
         <button type="submit" class="btn btn-accent w-full">ADD MEDICINE</button>
     </form>

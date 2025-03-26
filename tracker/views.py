@@ -83,11 +83,28 @@ def weekly_log(request):
         
         grouped_logs[current_date] = day_logs
     
+    # Handle adding new medicine
+    if request.method == 'POST' and 'add_medicine' in request.POST:
+        form = MedicineForm(request.POST)
+        if form.is_valid():
+            medicine = form.save(commit=False)
+            medicine.user = request.user
+            medicine.save()
+            # Create logs for the new medicine for all dates in view
+            for i in range(7):
+                current_date = start_date + timedelta(days=i)
+                MedicineLog.objects.create(user=request.user, medicine=medicine, date=current_date)
+            messages.success(request, f'Medicine {medicine.name} added successfully!')
+            return redirect('weekly_log')
+    else:
+        form = MedicineForm()
+
     context = {
         'grouped_logs': grouped_logs,
         'start_date': start_date,
         'end_date': start_date + timedelta(days=6),
-        'view_type': 'weekly'
+        'view_type': 'weekly',
+        'form': form
     }
     return render(request, 'tracker/medicine_log.html', context)
 
@@ -128,20 +145,46 @@ def monthly_log(request):
             
             grouped_logs[current_date] = day_logs
     
+    # Handle adding new medicine
+    if request.method == 'POST' and 'add_medicine' in request.POST:
+        form = MedicineForm(request.POST)
+        if form.is_valid():
+            medicine = form.save(commit=False)
+            medicine.user = request.user
+            medicine.save()
+            # Create logs for the new medicine for all dates in month
+            for day in range(1, num_days + 1):
+                current_date = date(year, month, day)
+                if current_date <= today:  # Only create logs up to today
+                    MedicineLog.objects.create(user=request.user, medicine=medicine, date=current_date)
+            messages.success(request, f'Medicine {medicine.name} added successfully!')
+            return redirect('monthly_log')
+    else:
+        form = MedicineForm()
+
     context = {
         'grouped_logs': grouped_logs,
         'month_name': calendar.month_name[month],
         'year': year,
-        'view_type': 'monthly'
+        'view_type': 'monthly',
+        'form': form
     }
     return render(request, 'tracker/medicine_log.html', context)
 
 @login_required
 def mark_taken(request, log_id):
     log = get_object_or_404(MedicineLog, id=log_id, user=request.user)
-    log.taken = True
-    log.save()
-    messages.success(request, f'Marked {log.medicine.name} as taken!')
+    
+    if log.taken < log.medicine.dose_count:
+        log.taken += 1
+        log.save()
+        remaining = log.medicine.dose_count - log.taken
+        if remaining > 0:
+            messages.success(request, f'Marked {log.medicine.name} as taken ({log.taken}/{log.medicine.dose_count})!')
+        else:
+            messages.success(request, f'Completed all doses for {log.medicine.name} today!')
+    else:
+        messages.warning(request, f'All doses for {log.medicine.name} already taken today!')
     
     # Determine which view to redirect to based on the referer
     referer = request.META.get('HTTP_REFERER', '')

@@ -46,31 +46,33 @@
             --error-content: #ffffff;
         }
         
-        /* Campfire Theme */
+        /* Dark Medicine Theme */
         .campfire {
-            --primary: #e67e22;      /* Warm campfire orange */
-            --primary-focus: #d35400; /* Darker orange */
+            --primary: #3b82f6;      /* Blue - Medical blue */
+            --primary-focus: #2563eb; /* Darker blue */
             --primary-content: #ffffff;
-            --secondary: #2c3e50;    /* Deep ocean blue */
-            --secondary-focus: #1a2530; /* Darker ocean blue */
+            --secondary: #06b6d4;    /* Cyan - Clean/sterile */
+            --secondary-focus: #0891b2; /* Darker cyan */
             --secondary-content: #ffffff;
-            --accent: #ff6b35;       /* Bright flames */
-            --accent-focus: #e74c3c; /* Darker flames */
+            --accent: #8b5cf6;       /* Violet - Calming */
+            --accent-focus: #7c3aed; /* Darker violet */
             --accent-content: #ffffff;
-            --neutral: #1e2a3a;      /* Night sky */
-            --neutral-focus: #0f1219; /* Darker night sky */
+            --neutral: #1e293b;      /* Slate-800 */
+            --neutral-focus: #0f172a; /* Slate-900 */
             --neutral-content: #ffffff;
-            --base-100: #0f1219;     /* Dark sand/night */
-            --base-200: #0a0d12;     /* Darker sand/night */
-            --base-300: #050709;     /* Darkest sand/night */
-            --base-content: #e0e0e0; /* Text on dark background */
-            --info: #3498db;         /* Ocean water */
+            --base-100: #1e293b;     /* Dark slate */
+            --base-200: #0f172a;     /* Darker slate */
+            --base-300: #020617;     /* Darkest slate */
+            --border: #334155;       /* Subtle border color */
+            --border-focus: #3b82f6; /* Blue border on focus */
+            --base-content: #e2e8f0; /* Light text on dark background */
+            --info: #0ea5e9;         /* Sky blue */
             --info-content: #ffffff;
-            --success: #2ecc71;      /* Beach vegetation */
+            --success: #10b981;      /* Emerald */
             --success-content: #ffffff;
-            --warning: #f1c40f;      /* Ember glow */
+            --warning: #f59e0b;      /* Amber */
             --warning-content: #ffffff;
-            --error: #e74c3c;        /* Hot coals */
+            --error: #ef4444;        /* Red */
             --error-content: #ffffff;
         }
         
@@ -131,29 +133,31 @@
         }
         
         html[data-theme="campfire"] {
-            --primary: #e67e22;
-            --primary-focus: #d35400;
+            --primary: #3b82f6;
+            --primary-focus: #2563eb;
             --primary-content: #ffffff;
-            --secondary: #2c3e50;
-            --secondary-focus: #1a2530;
+            --secondary: #06b6d4;
+            --secondary-focus: #0891b2;
             --secondary-content: #ffffff;
-            --accent: #ff6b35;
-            --accent-focus: #e74c3c;
+            --accent: #8b5cf6;
+            --accent-focus: #7c3aed;
             --accent-content: #ffffff;
-            --neutral: #1e2a3a;
-            --neutral-focus: #0f1219;
+            --neutral: #1e293b;
+            --neutral-focus: #0f172a;
             --neutral-content: #ffffff;
-            --base-100: #0f1219;
-            --base-200: #0a0d12;
-            --base-300: #050709;
-            --base-content: #e0e0e0;
-            --info: #3498db;
+            --base-100: #1e293b;
+            --base-200: #0f172a;
+            --base-300: #020617;
+            --border: #334155;
+            --border-focus: #3b82f6;
+            --base-content: #e2e8f0;
+            --info: #0ea5e9;
             --info-content: #ffffff;
-            --success: #2ecc71;
+            --success: #10b981;
             --success-content: #ffffff;
-            --warning: #f1c40f;
+            --warning: #f59e0b;
             --warning-content: #ffffff;
-            --error: #e74c3c;
+            --error: #ef4444;
             --error-content: #ffffff;
         }
         
@@ -236,10 +240,10 @@
         
         /* Form styles */
         .input-bordered {
-            border: 1px solid var(--base-300);
+            border: 1px solid var(--border, var(--base-300));
         }
         .input-bordered:focus {
-            border-color: var(--primary);
+            border-color: var(--border-focus, var(--primary));
             outline: none;
         }
         
@@ -249,6 +253,7 @@
             overflow: hidden;
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
             transition: all 0.3s ease;
+            border: 1px solid var(--border, var(--base-300));
         }
         
         .card:hover {

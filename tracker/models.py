@@ -1,21 +1,38 @@
 from django.db import models
 from django.contrib.auth.models import User
 
+FREQUENCY_CHOICES = [
+    ('daily', 'Daily'),
+    ('weekly', 'Weekly'),
+    ('monthly', 'Monthly'),
+]
+
 class Medicine(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=100)
     dosage = models.CharField(max_length=50)
+    frequency = models.CharField(max_length=10, choices=FREQUENCY_CHOICES, default='daily')
+    dose_count = models.PositiveIntegerField(default=1)
     start_date = models.DateField(auto_now_add=True)
     active = models.BooleanField(default=True)
 
     def __str__(self):
         return f"{self.name} ({self.dosage})"
+    
+    def get_doses_taken(self, date):
+        """Get number of doses taken for a specific date"""
+        log = MedicineLog.objects.filter(
+            user=self.user,
+            medicine=self,
+            date=date
+        ).first()
+        return log.taken if log else 0
 
 class MedicineLog(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     medicine = models.ForeignKey(Medicine, on_delete=models.CASCADE)
     date = models.DateField()
-    taken = models.BooleanField(default=False)
+    taken = models.PositiveIntegerField(default=0)
 
     class Meta:
         unique_together = ('user', 'medicine', 'date')
@@ -39,3 +56,7 @@ class MedicineLog(models.Model):
             date__year=year,
             date__month=month
         ).order_by('date', 'medicine__name')
+    
+    def is_complete(self):
+        """Check if all doses for this medicine on this date are taken"""
+        return self.taken >= self.medicine.dose_count
