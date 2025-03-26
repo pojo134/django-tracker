@@ -142,9 +142,13 @@
     {% endif %}
 </div>
 
-<div class="card bg-base-100 shadow-xl p-8 mt-8">
-    <h2 class="text-2xl font-bold mb-6 text-center text-primary">Add New Medicine</h2>
-    <form method="post" class="max-w-md mx-auto">
+<div class="collapse collapse-plus bg-base-100 shadow-xl mt-8">
+    <input type="checkbox" class="peer" />
+    <div class="collapse-title text-2xl font-bold text-center text-primary">
+        Add New Medicine
+    </div>
+    <div class="collapse-content">
+        <form method="post" class="max-w-md mx-auto p-8">
         {% csrf_token %}
         <input type="hidden" name="add_medicine" value="1">
         
@@ -189,5 +193,6 @@
         
         <button type="submit" class="btn btn-accent w-full">ADD MEDICINE</button>
     </form>
+    </div>
 </div>
 {% endblock %}
