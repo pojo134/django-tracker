@@ -174,7 +174,7 @@ def monthly_log(request):
 @login_required
 def mark_taken(request, log_id):
     log = get_object_or_404(MedicineLog, id=log_id, user=request.user)
-    
+
     if log.taken < log.medicine.dose_count:
         log.taken += 1
         log.save()
@@ -185,15 +185,34 @@ def mark_taken(request, log_id):
             messages.success(request, f'Completed all doses for {log.medicine.name} today!')
     else:
         messages.warning(request, f'All doses for {log.medicine.name} already taken today!')
-    
-    # Determine which view to redirect to based on the referer
+
+    # Aggregate doses for weekly and monthly views
     referer = request.META.get('HTTP_REFERER', '')
     if 'weekly' in referer:
+        start_date = log.date - timedelta(days=log.date.weekday())
+        end_date = start_date + timedelta(days=6)
+        weekly_logs = MedicineLog.objects.filter(
+            user=request.user,
+            medicine=log.medicine,
+            date__range=[start_date, end_date]
+        )
+        total_taken = sum(weekly_log.taken for weekly_log in weekly_logs)
+        messages.info(request, f'Total doses taken this week for {log.medicine.name}: {total_taken}/{log.medicine.dose_count * 7}')
         return redirect('weekly_log')
+
     elif 'monthly' in referer:
+        monthly_logs = MedicineLog.objects.filter(
+            user=request.user,
+            medicine=log.medicine,
+            date__year=log.date.year,
+            date__month=log.date.month
+        )
+        total_taken = sum(monthly_log.taken for monthly_log in monthly_logs)
+        days_in_month = calendar.monthrange(log.date.year, log.date.month)[1]
+        messages.info(request, f'Total doses taken this month for {log.medicine.name}: {total_taken}/{log.medicine.dose_count * days_in_month}')
         return redirect('monthly_log')
-    else:
-        return redirect('medicine_log')
+
+    return redirect('medicine_log')
 
 @login_required
 def add_medicine(request):

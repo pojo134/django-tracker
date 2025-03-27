@@ -26,7 +26,7 @@
             <div class="card bg-base-100 shadow-md {% if log.taken %}border-l-4 border-success{% else %}border-l-4 border-error{% endif %}">
                 <div class="card-body">
                     <h3 class="card-title text-center">{{ log.medicine.name }}</h3>
-                    <p><strong>Dosage:</strong> {{ log.medicine.dosage }} {{ log.medicine.get_frequency_display }}</p>
+                    <p><strong>Dosage:</strong> {{ log.medicine.dosage }} {{ log.medicine.dose_count }}x {{ log.medicine.get_frequency_display }}</p>
                     <p class="mb-0"><strong>Status:</strong>
                         {% if log.is_complete %}
                         <span class="text-success">✓ Completed ({{ log.taken }}/{{ log.medicine.dose_count }})</span>

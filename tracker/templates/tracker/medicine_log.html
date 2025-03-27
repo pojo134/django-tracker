@@ -107,6 +107,25 @@
     .nav-buttons a:hover {
         transform: translateY(-3px);
     }
+
+    .nav-button-daily {
+        background-color: #47b8e0;
+    }
+    .nav-button-daily.active {
+        background-color: #ff7e5f;
+    }
+    .nav-button-weekly {
+        background-color: #47b8e0;
+    }
+    .nav-button-weekly.active {
+        background-color: #ff7e5f;
+    }
+    .nav-button-monthly {
+        background-color: #47b8e0;
+    }
+    .nav-button-monthly.active {
+        background-color: #ff7e5f;
+    }
 </style>
 {% endblock %}
 
@@ -118,9 +137,9 @@
 
 <div class="card">
 <div class="nav-buttons">
-    <a href="{% url 'medicine_log' %}" style="background-color: {% if view_type == 'daily' %}#ff7e5f{% else %}#47b8e0{% endif %};">Daily</a>
-    <a href="{% url 'weekly_log' %}" style="background-color: {% if view_type == 'weekly' %}#ff7e5f{% else %}#47b8e0{% endif %};">Weekly</a>
-    <a href="{% url 'monthly_log' %}" style="background-color: {% if view_type == 'monthly' %}#ff7e5f{% else %}#47b8e0{% endif %};">Monthly</a>
+    <a href="{% url 'medicine_log' %}" class="btn nav-button-daily {% if view_type == 'daily' %}active{% endif %}">Daily</a>
+    <a href="{% url 'weekly_log' %}" class="btn nav-button-weekly {% if view_type == 'weekly' %}active{% endif %}">Weekly</a>
+    <a href="{% url 'monthly_log' %}" class="btn nav-button-monthly {% if view_type == 'monthly' %}active{% endif %}">Monthly</a>
 </div>
 
     {% if view_type == 'daily' %}
@@ -133,129 +152,88 @@
     
     {% if view_type == 'daily' %}
         {% if logs %}
-        <div class="medicine-grid">
-            {% for log in logs %}
-            <div class="medicine-item {% if log.taken %}taken{% else %}not-taken{% endif %}">
-                <h3>{{ log.medicine.name }}</h3>
-                <p><strong>Dosage:</strong> {{ log.medicine.dosage }}</p>
-                <p><strong>Status:</strong> 
-                    {% if log.taken %}
-                    <span class="success">✓ Taken</span>
-                    {% else %}
-                    <span class="error">Not Taken</span>
-                    {% endif %}
-                </p>
-                
-                <div class="medicine-actions">
-                    {% if not log.taken %}
-                    <form method="post" action="{% url 'mark_taken' log.id %}">
-                        {% csrf_token %}
-                        <button type="submit" class="btn btn-sm">Mark as Taken</button>
-                    </form>
-                    {% endif %}
-                    <form method="post" action="{% url 'deactivate_medicine' log.medicine.id %}" style="display: inline-block; margin-left: 10px;">
-                        {% csrf_token %}
-                        <button type="submit" class="btn btn-sm btn-warning">Remove Medicine</button>
-                    </form>
-                </div>
-            </div>
-            {% endfor %}
-        </div>
-        {% else %}
-        <div class="message warning">
-            <p>You don't have any active medicines. Add one below!</p>
-        </div>
-        {% endif %}
-    {% elif view_type == 'weekly' %}
-        {% if grouped_logs %}
-        <div class="calendar-grid">
-            <!-- Day headers -->
-            <div class="calendar-day-header">Sunday</div>
-            <div class="calendar-day-header">Monday</div>
-            <div class="calendar-day-header">Tuesday</div>
-            <div class="calendar-day-header">Wednesday</div>
-            <div class="calendar-day-header">Thursday</div>
-            <div class="calendar-day-header">Friday</div>
-            <div class="calendar-day-header">Saturday</div>
+        <div class="medicine-item {% if log.taken %}taken{% else %}not-taken{% endif %}">
+            <h3>{{ log.medicine.name }}</h3>
+            <p><strong>Dosage:</strong> {{ log.medicine.dosage }}</p>
+            <p><strong>Status:</strong> 
+                {% if log.taken %}
+                <span class="success">✓ Taken</span>
+                {% else %}
+                <span class="error">Not Taken</span>
+                {% endif %}
+            </p>
             
-            <!-- Calendar days -->
-            {% for date, day_logs in grouped_logs.items %}
-            <div class="calendar-day">
-                <div style="font-weight: bold;">{{ date|date:"M d" }}</div>
-                {% for log in day_logs %}
-                <div class="medicine-status">
-                    {% if log.taken %}
-                    <span class="check-icon">✓</span>
-                    {% else %}
-                    <span>❌</span>
-                    {% endif %}
-                    {{ log.medicine.name }}
-                </div>
-                {% endfor %}
+            <div class="medicine-actions">
+                {% if not log.taken %}
+                <form method="post" action="{% url 'mark_taken' log.id %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-sm">Mark as Taken</button>
+                </form>
+                {% endif %}
+                <form method="post" action="{% url 'deactivate_medicine' log.medicine.id %}" style="display: inline-block; margin-left: 10px;">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-sm btn-warning">Remove Medicine</button>
+                </form>
             </div>
-            {% endfor %}
-        </div>
-        {% else %}
-        <div class="message warning">
-            <p>You don't have any active medicines. Add one below!</p>
-        </div>
-        {% endif %}
-    {% elif view_type == 'monthly' %}
-        {% if grouped_logs %}
-        <div class="calendar-grid">
-            <!-- Day headers -->
-            <div class="calendar-day-header">Sunday</div>
-            <div class="calendar-day-header">Monday</div>
-            <div class="calendar-day-header">Tuesday</div>
-            <div class="calendar-day-header">Wednesday</div>
-            <div class="calendar-day-header">Thursday</div>
-            <div class="calendar-day-header">Friday</div>
-            <div class="calendar-day-header">Saturday</div>
-            
-            <!-- Calendar days -->
-            {% for date, day_logs in grouped_logs.items %}
-            <div class="calendar-day">
-                <div style="font-weight: bold;">{{ date|date:"M d" }}</div>
-                {% for log in day_logs %}
-                <div class="medicine-status">
-                    {% if log.taken %}
-                    <span class="check-icon">✓</span>
-                    {% else %}
-                    <span>❌</span>
-                    {% endif %}
-                    {{ log.medicine.name }}
-                </div>
-                {% endfor %}
-            </div>
-            {% endfor %}
-        </div>
-        {% else %}
-        <div class="message warning">
-            <p>You don't have any active medicines. Add one below!</p>
-        </div>
-        {% endif %}
-    {% endif %}
-</div>
-
-<div class="card">
-    <h2 class="mb-3">Add New Medicine</h2>
-    <form method="post" style="max-width: 500px; margin: 0 auto;">
-        {% csrf_token %}
-        <input type="hidden" name="add_medicine" value="1">
-        
-        {% for field in form %}
-        <div class="form-group">
-            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-            {{ field }}
-            {% if field.errors %}
-            <div class="error">
-                {{ field.errors }}
-            </div>
-            {% endif %}
         </div>
         {% endfor %}
+    </div>
+    {% else %}
+    <div class="message warning">
+        <p>You don't have any active medicines. Add one below!</p>
+    </div>
+    {% endif %}
+{% elif view_type == 'weekly' %}
+    {% if grouped_logs %}
+    <div class="calendar-grid">
+        <!-- Day headers -->
+        <div class="calendar-day-header">Sunday</div>
+        <div class="calendar-day-header">Monday</div>
+        <div class="calendar-day-header">Tuesday</div>
+        <div class="calendar-day-header">Wednesday</div>
+        <div class="calendar-day-header">Thursday</div>
+        <div class="calendar-day-header">Friday</div>
+        <div class="calendar-day-header">Saturday</div>
         
-        <button type="submit" class="btn btn-accent">Add Medicine</button>
-    </form>
-</div>
-{% endblock %}
+        <!-- Calendar days -->
+        {% for date, day_logs in grouped_logs.items %}
+        <div class="calendar-day">
+            <div style="font-weight: bold;">{{ date|date:"M d" }}</div>
+            {% for log in day_logs %}
+            <div class="medicine-status">
+                {% if log.taken %}
+                <span class="check-icon">✓</span>
+                {% else %}
+                <span>❌</span>
+                {% endif %}
+                {{ log.medicine.name }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="message warning">
+        <p>You don't have any active medicines. Add one below!</p>
+    </div>
+    {% endif %}
+{% elif view_type == 'monthly' %}
+    {% if grouped_logs %}
+    <div class="calendar-grid">
+        <!-- Day headers -->
+        <div class="calendar-day-header">Sunday</div>
+        <div class="calendar-day-header">Monday</div>
+        <div class="calendar-day-header">Tuesday</div>
+        <div class="calendar-day-header">Wednesday</div>
+        <div class="calendar-day-header">Thursday</div>
+        <div class="calendar-day-header">Friday</div>
+        <div class="calendar-day-header">Saturday</div>
+        
+        <!-- Calendar days -->
+        {% for date, day_logs in grouped_logs.items %}
+        <div class="calendar-day">
+            <div style="font-weight: bold;">{{ date|date:"M d" }}</div>
+            {% for log in day_logs %}
+            <div class="medicine-status">
+                {% if log.taken %}
+                <span class="check-icon
